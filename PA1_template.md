@@ -1,13 +1,9 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r, results="hide"}
+
+```r
 # unzip and read file
 unzip("activity.zip")
 activity <- read.csv("activity.csv", stringsAsFactors=FALSE)
@@ -18,37 +14,70 @@ Sys.setlocale("LC_TIME", "C")
 ```
 
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 # calculate and plot total steps per day
 actday <- aggregate(steps~date, activity, sum)
 plot(actday$date, actday$steps, type="h", main="Total steps per day", xlab="Date", ylab="Steps")
+```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+```r
 # calculate the average total steps per day
 mean(actday$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 # calculate the median of total steps per day
 median(actday$steps)
 ```
 
+```
+## [1] 10765
+```
+
 ## What is the average daily activity pattern?
-```{r}
+
+```r
 # calculate and plot average steps per interval
 actinterval <- aggregate(steps~interval, activity, mean)
 plot(actinterval$interval, actinterval$steps, type="l", main="Average steps per interval", xlab="Interval", ylab="Steps")
+```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+```r
 # which interval contains the maximum number of steps
 actinterval$interval[actinterval$steps==max(actinterval$steps)]
 ```
 
+```
+## [1] 835
+```
+
 ## Imputing missing values
-```{r}
+
+```r
 # how many rows in the data set include NAs?
 incompleterows <- sum(!complete.cases(activity))
 print(incompleterows)
 ```
 
-The dataset includes `r incompleterows` incomplete rows. 
+```
+## [1] 2304
+```
+
+The dataset includes 2304 incomplete rows. 
 In order to fill the missing values we can use the average steps for a given interval.  
 This way it is taken into consideration that the number of steps changes during the course of the day (e.g. during night time the number of steps might be smaller than during daytime).
 
-```{r}
+
+```r
 activity_complete <- activity
 # check for each row in the data frame whether column steps is not filled
 for (i in 1:nrow(activity_complete)) {
@@ -61,10 +90,26 @@ for (i in 1:nrow(activity_complete)) {
 # calculate and plot total steps per day
 actday_comp <- aggregate(steps~date, activity_complete, sum)
 plot(actday_comp$date, actday_comp$steps, type="h", main="Total steps per day", xlab="Date", ylab="Steps")
+```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
+```r
 # calculate the average total steps per day
 mean(actday_comp$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 # calculate the median of total steps per day
 median(actday_comp$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 The mean and the median do not differ a lot from their estimates in the first part of this assignment - the mean is the same and the median is close to the original estimate.  
@@ -76,7 +121,8 @@ And the median was moved from "close to the mean" to the mean.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+
+```r
 # introduce new column that includes whether the date belongs to a weekend or to a weekday
 for (i in 1:nrow(activity_complete)) {  
     if (weekdays(activity_complete$date[i]) %in% c("Saturday", "Sunday")) {
@@ -94,4 +140,6 @@ library(ggplot2)
 qplot(interval, steps, data=actinterval_comp, facets=weekday~., 
       xlab="Interval", ylab="Steps", main="Average steps per interval", geom = "line")
 ```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
 
